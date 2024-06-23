@@ -1,0 +1,66 @@
+version: '3'
+
+networks:
+  app-network:
+    driver: bridge
+
+services:
+  db:
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=yaman
+      - POSTGRES_PASSWORD=yaman123
+      - POSTGRES_DB=taskmng
+    networks:
+      - app-network
+
+  mongo:
+    image: mongo:4.4
+    networks:
+      - app-network
+
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=development
+      - POSTGRES_USER=yaman
+      - POSTGRES_PASSWORD=yaman123
+      - POSTGRES_DB=taskmng
+      - DATABASE_URL=postgresql://yaman:yaman123@db:5432/taskmng
+      - MONGO_URI=mongodb://mongo:27017/taskmnglogs
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - db
+      - mongo
+#      - redis
+    networks:
+      - app-network
+
+
+#
+#  redis:
+#    image: redis:6
+#    networks:
+#      - app-network
+#
+#  celery_worker:
+#    build: .
+#    command: celery -A app.celery worker --loglevel=info
+#    environment:
+#      - POSTGRES_USER=yaman
+#      - POSTGRES_PASSWORD=yaman123
+#      - POSTGRES_DB=taskmng
+#      - DATABASE_URL=postgresql://yaman:yaman123@db:5432/taskmng
+#      - MONGO_URI=mongodb://mongo:27017/taskmnglogs
+#      - CELERY_BROKER_URL=redis://redis:6379/0
+#      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+#    depends_on:
+#      - web
+#      - db
+#      - mongo
+#      - redis
+#    networks:
+#      - app-network
