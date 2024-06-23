@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Tasks</h2>
+<a href="{{ url_for('main.new_task') }}">Create New Task</a>
+<div class="grid-container">
+    {% for task in tasks %}
+    <div class="task-card">
+        <h3>{{ task.name }}</h3>
+        <p><strong>Description:</strong> {{ task.description }}</p>
+        <p><strong>Priority:</strong> {{ task.priority }}</p>
+        <p><strong>Due Date:</strong> {{ task.due_date }}</p>
+        <a href="{{ url_for('main.edit_task', task_id=task.id) }}">Edit</a>
+        <form style="display: inline;" method="POST" action="{{ url_for('main.delete_task', task_id=task.id) }}">
+            <input type="submit" value="Delete">
+        </form>
+    </div>
+    {% endfor %}
+</div>
+<a href="{{ url_for('main.logout') }}">Logout</a>
+{% endblock %}
