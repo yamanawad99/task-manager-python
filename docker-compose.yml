@@ -19,6 +19,11 @@ services:
     networks:
       - app-network
 
+  redis:
+    image: redis:6
+    networks:
+      - app-network
+
   web:
     build: .
     ports:
@@ -35,32 +40,26 @@ services:
     depends_on:
       - db
       - mongo
-#      - redis
+      - redis
     networks:
       - app-network
 
 
-#
-#  redis:
-#    image: redis:6
-#    networks:
-#      - app-network
-#
-#  celery_worker:
-#    build: .
-#    command: celery -A app.celery worker --loglevel=info
-#    environment:
-#      - POSTGRES_USER=yaman
-#      - POSTGRES_PASSWORD=yaman123
-#      - POSTGRES_DB=taskmng
-#      - DATABASE_URL=postgresql://yaman:yaman123@db:5432/taskmng
-#      - MONGO_URI=mongodb://mongo:27017/taskmnglogs
-#      - CELERY_BROKER_URL=redis://redis:6379/0
-#      - CELERY_RESULT_BACKEND=redis://redis:6379/0
-#    depends_on:
-#      - web
-#      - db
-#      - mongo
-#      - redis
-#    networks:
-#      - app-network
+  celery_worker:
+    build: .
+    command: celery -A app.celery_app worker --loglevel=info
+    environment:
+      - POSTGRES_USER=yaman
+      - POSTGRES_PASSWORD=yaman123
+      - POSTGRES_DB=taskmng
+      - DATABASE_URL=postgresql://yaman:yaman123@db:5432/taskmng
+      - MONGO_URI=mongodb://mongo:27017/taskmnglogs
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - web
+      - db
+      - mongo
+      - redis
+    networks:
+      - app-network
