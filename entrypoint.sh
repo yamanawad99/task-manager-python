@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
 ls -a
@@ -16,24 +16,15 @@ if ! [ -d "migrations" ]; then
     echo ls
     echo "Initializing migrations..."
     flask db init
-    flask db migrate -m "Initial migration"
-    flask db upgrade
 else
     echo "Upgrading database..."
+    flask db migrate -m "Initial migration"
     flask db upgrade
 fi
-
-# Generate a new migration if there are changes
-flask db migrate -m "Auto-generated migration"
-
-# Apply any pending migrations
-flask db upgrade
-
 # Create an admin user if it doesn't exist
 python << END
-from app import create_app, db
+from app import app, db
 from app.models import User
-app = create_app()
 
 with app.app_context():
     db.create_all()
